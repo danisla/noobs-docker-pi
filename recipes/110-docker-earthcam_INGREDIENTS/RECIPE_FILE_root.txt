@@ -1,6 +1,0 @@
-#
-#Recipe: 110-docker-earthcam
-#- Startup script.
-../../pi-kitchen/110-docker-earthcam/_RUNSTART/earthcam_runstart.sh /home/pi/bin/_RUNSTART
-#- (optional) Disable runstart script
-#../../pi-kitchen/110-docker-earthcam/_RUNONCE/110-disable_runstart.sh /home/pi/bin/_RUNONCE

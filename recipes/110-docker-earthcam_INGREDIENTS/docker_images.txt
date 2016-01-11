@@ -1,1 +1,0 @@
-danisla/rpi-earthcam:latest
