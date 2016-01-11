@@ -1,0 +1,6 @@
+#
+#Recipe: 046-openssh-root-pubkey-only
+#- script to add authorized_keys file
+../../pi-kitchen/046-openssh-key-only/_RUNONCE/add_authorized_keys.sh /home/pi/bin/_RUNONCE
+#- script to update sshd_config
+../../pi-kitchen/046-openssh-key-only/_RUNONCE/update_sshd_config.sh /home/pi/bin/_RUNONCE

@@ -7,6 +7,9 @@ function checkdeps() {
     [[ -e `which dos2unix` ]] || (log "ERROR: Missing dos2unix, try 'brew install dos2unix'" && return 1)
 }
 
+# Env flag to apply 062-display_rotate_180 recipe, useful with the official Raspberry Pi LCD screen mount.
+DISPLAY_ROTATE=${DISPLAY_ROTATE:-false}
+
 ####################################
 
 MAIN_DOCKER_COMPOSE=${MAIN_DOCKER_COMPOSE:-$1}
@@ -18,12 +21,16 @@ MAIN_DOCKER_COMPOSE=${MAIN_DOCKER_COMPOSE:-$1}
 ### HypriotOS config (recommended) ###
 OS="HypriotOS"
 FLAVOUR="HypriotOS"
-RECIPES="001-startup 059-docker-image-import 060-gpu-mem-512 061-fast-usb-mouse 055-hypriotos 058-startup-docker-compose"
+RECIPES="001-startup 059-docker-image-import 060-gpu-mem-512 061-fast-usb-mouse 055-hypriotos 046-openssh-root-pubkey-only 058-startup-docker-compose"
 
 ### Minibian config (work in progress) ###
 #OS="Minibian"
 #FLAVOUR="MinibianDocker"
 #RECIPES="001-startup 030-fake-sudo 040-timezone-gmt 041-update-ntp 042-set-locale-us 045-openssh-server 050-docker 059-docker-image-import 060-gpu-mem-512 120-no-gui-no-autologin 058-startup-docker-compose"
+
+if [[ ${DISPLAY_ROTATE} == true ]]; then
+    RECIPES="${RECIPES} 062-display_rotate_180"
+fi
 
 CFG_BASE="$(pwd)"
 OS_BASE="${CFG_BASE}/os"

@@ -1,0 +1,4 @@
+#
+#Recipe: 062-display_rotate_180
+#- script.
+../../pi-kitchen/062-display_rotate_180/_RUNONCE/display_rotate_180.sh /home/pi/bin/_RUNONCE
