@@ -1,0 +1,4 @@
+#
+#Recipe: 050-docker
+#- Call runonce script
+../../pi-kitchen/050-docker/_RUNONCE/050-install-docker.sh /home/pi/bin/_RUNONCE

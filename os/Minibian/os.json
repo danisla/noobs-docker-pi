@@ -1,0 +1,11 @@
+{
+  "name": "Minibian",
+  "version": "jessie",
+  "release_date": "2015-11-12",
+  "kernel": "4.1",
+  "description": "A minimal release of Raspbian Jessie",
+  "url": "https://minibianpi.wordpress.com/",
+  "username": "root",
+  "password": "raspberry",
+  "supported_hex_revisions": "2,3,4,5,6,7,8,9,d,e,f,10,11,12,14,19,1040,1041,900092"
+}

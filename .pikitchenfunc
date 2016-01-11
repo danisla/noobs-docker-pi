@@ -1,0 +1,180 @@
+#!/usr/bin/env bash
+
+source .commonfunc
+
+function unmount() {
+    echo "Unmounting ${disk} ..."
+    diskutil unmountDisk /dev/${disk}s1
+    diskutil unmountDisk /dev/${disk}
+}
+
+function format_sdcard() {
+    disk=$1
+    sudo diskutil eraseDisk FAT32 RECOVERY MBRFormat /dev/${disk} || return 1
+    sleep 2
+}
+
+export disk=""
+function get_sd_card() {
+    # try to find the correct disk of the inserted SD card
+    disk=`df | grep --color=never -e "disk[0-9]s1" | grep --color=never Volumes | cut -c 6-10`
+    if [ "${disk}" == "" ]; then
+      echo "No SD card found. Please insert SD card, I'll wait for it..."
+      while [ "${disk}" == "" ]; do
+        sleep 1
+        disk=`df | grep --color=never -e "disk[0-9]s1" | grep --color=never Volumes | cut -c 6-10`
+      done
+    fi
+
+    df
+    while true; do
+      echo ""
+      read -p "Is /dev/${disk}s1 correct? " yn
+      case $yn in
+        [Yy]* ) break;;
+        [Nn]* ) disk=""; return;;
+        * ) echo "Please answer yes or no.";;
+      esac
+    done
+}
+
+export boot=""
+function get_boot_dir() {
+    boot=$(df | grep --color=never /dev/${disk}s1 | sed 's,.*/Volumes,/Volumes,')
+    if [ "${boot}" == "" ]; then
+      while [ "${boot}" == "" ]; do
+        sleep 1
+        boot=$(df | grep --color=never /dev/${disk}s1 | sed 's,.*/Volumes,/Volumes,')
+      done
+    fi
+}
+
+function install_os() {
+    boot=$1
+    os=$2
+    os_base=$3
+
+    boot_archive="${os_base}/${os}/boot.tar.xz"
+    root_archive="${os_base}/${os}/root.tar.xz"
+
+    log "DEBUG: ${boot_archive} ${root_archive}"
+
+    if [[ ! -e "${boot_archive}" || ! -e "${root_archive}" ]]; then
+
+        [[ ! -e `which vagrant` ]] && log "ERROR: vagrant is not installed, cannot install ${os}" && return 1
+
+        [[ -z "${RPI_IMG}" ]] && log "ERROR: Cannot build ${os} tarballs, RPI_IMG is not set, must point to .img or .img.zip file." && return 1
+        export OS_NAME="$os"
+
+        oldpwd=$(pwd)
+        cd noobs-docker-pi
+
+        (vagrant up --provision && vagrant destroy -f) || (log "ERROR: Could not generate $os tarballs." && return 1)
+        cd "${oldpwd}" >/dev/null
+    else
+        log "INFO: ${os} $(basename ${boot_archive}) and $(basename ${root_archive}) already exist, skipping rebuild."
+    fi
+
+    log "INFO: Copying ${os_base}/${os} to ${boot}/os/${os}"
+    rsync -r "${os_base}/${os}" "${boot}/os/" && \
+    cd "${oldpwd}" >/dev/null || (log "ERROR: Could not sync ${os} files." && return 1)
+}
+
+function install_recipe() {
+    boot=$1
+    id=$2
+    os=$3
+    flavor=$4
+    ingredients_base=$5
+
+    ingredients="${ingredients_base}/${id}_INGREDIENTS.zip"
+
+    if [[ -e "${ingredients}" ]]; then
+        # Install from local zip
+        unzip -qo "${ingredients}" -d "${boot}/"
+        [[ ! $? -eq 0 ]] && log "ERROR: could not install ${id} ingredients from: ${ingredients}." && return 1
+
+    elif [[ -d "${ingredients/.zip/}" ]]; then
+        # Install from local dir
+        [[ ! -d "${boot}/pi-kitchen/${id}/" ]] && mkdir -p "${boot}/pi-kitchen/${id}/"
+        rsync -r "${ingredients_base}/${id}_INGREDIENTS/" "${boot}/pi-kitchen/${id}/"
+        [[ ! $? -eq 0 ]] && log "ERROR: could not install ${id} ingredients from: ${ingredients}." && return 1
+
+    elif [[ ! ${ingredients/http/} == ${ingredients} ]]; then
+        # Install from url.
+        log "ERROR: install recipe from URL not supported." && return 1
+
+    else
+        log "ERROR: could not find ingredients for: ${id}." && return 1
+    fi
+
+    # Apply dos2unix conversion on the text files.
+    find "${boot}/pi-kitchen/${id}" -type f | xargs -I {} file {} | grep -i "text" | awk -F: '{print $1}' | xargs dos2unix >/dev/null 2>&1
+    [[ ! $? -eq 0 ]] && log "ERROR: could not apply dos2unix conversion on ${id} files." && return 1
+
+    for part in root boot data; do
+        src="${boot}/pi-kitchen/${id}/RECIPE_FILE_${part}.txt"
+        dest="${boot}/os/${os}/${flavor}_${part}.txt"
+
+        if [[ (-s "${src}") && (! -e "${dest}" || -z `grep "$id" "${dest}"`) ]]; then
+            log "INFO: Copying recipe file: ${src} -> ${dest}"
+            cat "${src}" >> "${dest}"
+        fi
+    done
+}
+
+function install_noobs() {
+    boot=$1
+
+    #NOOBS_URL="https://downloads.raspberrypi.org/NOOBS/images/NOOBS-2015-11-24/NOOBS_v1_5_0.zip"
+    NOOBS_URL="https://downloads.raspberrypi.org/NOOBS_lite/images/NOOBS_lite-2015-11-24/NOOBS_lite_v1_5.zip"
+    NOOBS_ZIP="/tmp/$(basename $NOOBS_URL)"
+    NOOBS_DIR="/tmp/$(basename $NOOBS_URL .zip)"
+    if [[ ! -e "${NOOBS_ZIP}" ]]; then
+        log "INFO: Downloading ${NOOBS_URL} to ${NOOBS_ZIP}"
+        [[ ! -d "${NOOBS_DIR}" ]] && mkdir -p "${NOOBS_DIR}"
+        curl -L -o "${NOOBS_ZIP}" "${NOOBS_URL}" && \
+            unzip -qo -d "${NOOBS_DIR}" "${NOOBS_ZIP}" || (log "ERROR: could not download ${URL}" && return 1)
+    elif [[ ! -d "${NOOBS_DIR}" ]]; then
+        unzip -qo -d "${NOOBS_DIR}" "${NOOBS_ZIP}" || (log "ERROR: could not unzip ${NOOBS_ZIP}" && return 1)
+    fi
+    [[ ! -d "${NOOBS_DIR}" ]] && log "ERROR: Could not extract $NOOBS_ZIP to ${NOOBS_DIR}" && return 1
+
+    log "INFO: Copying $(basename $NOOBS_DIR) to ${boot}/"
+    rsync -r "${NOOBS_DIR}/" "${boot}/"
+}
+
+function install_noobsconfig() {
+    dest=$1
+
+    URL="https://github.com/procount/noobsconfig/archive/v1.0.zip"
+    ZIP="/tmp/noobsconfig.zip"
+    DIR="/tmp/noobsconfig-1.0"
+    if [[ ! -e "${ZIP}" ]]; then
+        log "INFO: Downloading ${URL} to ${ZIP}"
+        curl -L -o "${ZIP}" "${URL}" && \
+            unzip -qo -d "/tmp/" "${ZIP}" || (log "ERROR: could not download ${URL}" && return 1)
+    fi
+    [[ ! -d "${DIR}" ]] && log "ERROR: Could not extract $(basename $ZIP) zip to ${DIR}" && return 1
+
+    unzip -qo -d "${boot}" "${DIR}/noobsconfig.zip"
+}
+
+function add_flavour() {
+    boot=$1
+    os=$2
+    name=$3
+    desc=$4
+
+    osdir="${boot}/os/${os}"
+    flavour_file="${osdir}/flavours.json"
+
+    DEFAULT_FLAVOURS='{"flavours": []}'
+
+    [[ ! -e "${flavour_file}" ]] && echo "${DEFAULT_FLAVOURS}" > "${flavour_file}"
+
+    TMP_FILE="/tmp/flavours_$(date +s).json"
+    cat "${flavour_file}" | jq '.flavours |= [{"name": "'"${name}"'", "description": "'"${desc}"'"}]' > "${TMP_FILE}" && \
+        cp "${TMP_FILE}" "${flavour_file}" && \
+        rm "${TMP_FILE}"
+}

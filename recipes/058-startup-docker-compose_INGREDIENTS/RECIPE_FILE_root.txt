@@ -1,0 +1,4 @@
+#
+#Recipe: 058-startup-docker-compose
+#- Script to run docker-compose files on startup
+../../pi-kitchen/058-startup-docker-compose/_RUNSTART/run_docker_compose.sh /home/pi/bin/_RUNSTART

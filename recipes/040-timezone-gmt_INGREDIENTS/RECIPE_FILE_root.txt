@@ -1,0 +1,4 @@
+#
+#Recipe: 040-timezone-gmt
+#- Call runonce script
+../../pi-kitchen/040-timezone-gmt/_RUNONCE/040-timezone-gmt.sh /home/pi/bin/_RUNONCE

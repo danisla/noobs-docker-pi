@@ -1,0 +1,4 @@
+#
+#Recipe: 055-hypriotos
+#- Add occidentalis.txt for customization
+../../pi-kitchen/055-hypriotos/occidentalis.txt /

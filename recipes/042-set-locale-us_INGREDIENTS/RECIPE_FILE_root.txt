@@ -1,0 +1,4 @@
+#
+#Recipe: 042-set-locale-us
+#- Call runonce script
+../../pi-kitchen/042-set-locale-us/_RUNONCE/042-set-locale-us.sh /home/pi/bin/_RUNONCE

@@ -1,0 +1,4 @@
+#
+#Recipe: 030-fake-sudo
+#- Fake sudo script
+../../pi-kitchen/030-fake-sudo/sudo /usr/bin 0755 root root

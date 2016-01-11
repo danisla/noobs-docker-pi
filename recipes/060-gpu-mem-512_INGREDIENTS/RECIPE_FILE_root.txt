@@ -1,0 +1,4 @@
+#
+#Recipe: 060-gpu-mem-512
+#- GPU mem script.
+../../pi-kitchen/060-gpu-mem-512/_RUNONCE/gpu_mem_512.sh /home/pi/bin/_RUNONCE

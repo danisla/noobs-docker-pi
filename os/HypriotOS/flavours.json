@@ -1,0 +1,8 @@
+{
+  "flavours": [
+    {
+      "name": "HypriotOS",
+      "description": "Docker Pirates ARMed with explosive stuff"
+    }
+  ]
+}

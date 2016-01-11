@@ -1,0 +1,6 @@
+# hostname for your Hypriot Raspberry Pi:
+hostname=black-pearl
+
+# basic wireless networking options:
+# wifi_ssid=your-ssid
+# wifi_password=your-presharedkey

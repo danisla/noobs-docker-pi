@@ -1,0 +1,9 @@
+# Example docker-compose.yml
+# Place this on the root of the recovery partition or in the _USER/docker_runstart/<app name>/ folder.
+
+dockerui:
+    image: hypriot/rpi-dockerui:latest
+    ports:
+        - "9000:9000"
+    volumes:
+        - "/var/run/docker.sock:/var/run/docker.sock"

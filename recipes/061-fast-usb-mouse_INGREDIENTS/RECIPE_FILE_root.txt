@@ -1,0 +1,4 @@
+#
+#Recipe: 061-fase-usb-mouse
+#- GPU mem script.
+../../pi-kitchen/061-fase-usb-mouse/_RUNONCE/fast_usb_mouse.sh /home/pi/bin/_RUNONCE

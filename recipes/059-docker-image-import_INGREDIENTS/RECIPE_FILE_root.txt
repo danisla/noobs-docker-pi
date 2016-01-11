@@ -1,0 +1,4 @@
+#
+#Recipe: 059-docker-image-import
+#- Call runonce script
+../../pi-kitchen/059-docker-image-import/_RUNONCE/059-docker_image_import.sh /home/pi/bin/_RUNONCE

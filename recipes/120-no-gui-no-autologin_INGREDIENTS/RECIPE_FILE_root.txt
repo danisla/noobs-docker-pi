@@ -1,0 +1,4 @@
+#
+#Recipe: 120-no-gui-no-autologin
+#- Call runonce script
+../../pi-kitchen/120-no-gui-no-autologin/_RUNONCE/disable-gui-autologin.sh /home/pi/bin/_RUNONCE

@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+
+function log {
+  >&2 echo "${@}"
+}
+
+function get_input() {
+    msg=$1
+    default=$2
+    while [[ -z "$input" ]]; do
+        if [[ -n "$default" ]]; then
+            read -p "$msg ($default): " input
+            [[ -z $input ]] && input=$default
+        else
+            read -p "$msg: " input
+        fi
+    done
+    echo $input
+}

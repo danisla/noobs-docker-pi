@@ -1,0 +1,4 @@
+#
+#Recipe: 041-update-ntp
+#- Call runonce script
+../../pi-kitchen/041-update-ntp/_RUNONCE/041-update-ntp.sh /home/pi/bin/_RUNONCE

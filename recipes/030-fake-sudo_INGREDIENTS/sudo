@@ -1,0 +1,4 @@
+#!/bin/sh
+
+echo "WARN: sudo is not installed, /usr/bin/sudo is a passthrough script" >> /dev/kmsg
+su -c "$*"

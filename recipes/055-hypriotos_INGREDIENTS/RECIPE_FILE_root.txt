@@ -1,0 +1,4 @@
+#
+#Recipe: 055-hypriotos
+#- Call HypriotOS firstboot script
+../../pi-kitchen/055-hypriotos/_RUNONCE/055-hypriotos_firstboot.sh /home/pi/bin/_RUNONCE

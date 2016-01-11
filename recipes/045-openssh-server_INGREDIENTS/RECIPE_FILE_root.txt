@@ -1,0 +1,4 @@
+#
+#Recipe: 045-openssh-server
+#- Call runonce script
+../../pi-kitchen/045-openssh-server/_RUNONCE/045-openssh-server.sh /home/pi/bin/_RUNONCE
