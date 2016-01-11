@@ -66,11 +66,7 @@ function install_os() {
         [[ -z "${RPI_IMG}" ]] && log "ERROR: Cannot build ${os} tarballs, RPI_IMG is not set, must point to .img or .img.zip file." && return 1
         export OS_NAME="$os"
 
-        oldpwd=$(pwd)
-        cd noobs-docker-pi
-
         (vagrant up --provision && vagrant destroy -f) || (log "ERROR: Could not generate $os tarballs." && return 1)
-        cd "${oldpwd}" >/dev/null
     else
         log "INFO: ${os} $(basename ${boot_archive}) and $(basename ${root_archive}) already exist, skipping rebuild."
     fi
