@@ -2,3 +2,4 @@ os/*/boot.tar*
 os/*/root.tar*
 .vagrant
 id_rsa*
+rpi_id_rsa*

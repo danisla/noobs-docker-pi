@@ -14,10 +14,10 @@ function add_pub_key() {
         cat "${DEFAULT_SSH_PUB_KEY}" >> "${keys_file}"
     else
         # Generate new key.
-        ssh-keygen -t rsa -b 2048 -P '' -f ./id_rsa
+        ssh-keygen -t rsa -b 2048 -P '' -f ./rpi_id_rsa
 
-        log "INFO: Adding ./id_rsa.pub to authorized_keys file."
-        cat "./id_rsa.pub" >> "${keys_file}"
+        log "INFO: Adding ./rpi_id_rsa.pub to authorized_keys file."
+        cat "./rpi_id_rsa.pub" >> "${keys_file}"
     fi
 }
 
