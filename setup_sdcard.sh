@@ -87,7 +87,7 @@ done
 
 # Copy main docker-compose file.
 if [[ -e "${MAIN_DOCKER_COMPOSE}" ]]; then
-    rsync "${MAIN_DOCKER_COMPOSE}" "${boot}"
+    rsync -L "${MAIN_DOCKER_COMPOSE}" "${boot}"
     [[ $? -ne 0 ]] && log "ERORR: Could not copy ${MAIN_DOCKER_COMPOSE} to ${boot}" && exit 1
     log "INFO: ${MAIN_DOCKER_COMPOSE} installed to ${boot}"
 
@@ -96,6 +96,9 @@ if [[ -e "${MAIN_DOCKER_COMPOSE}" ]]; then
     "${boot}/pi-kitchen/059-docker-image-import/cache_docker_images.sh" "$boot" <(echo "${image}")
     [[ $? -ne 0 ]] && log "ERROR: Could not docker image in ${MAIN_DOCKER_COMPOSE}: ${image}" && exit 1
 fi
+
+# Create _USER directory structure.
+[[ ! -d "${boot}/_USER" ]] && mkdir -p "${boot}/_USER/{_RUNSTART,_RUNONCE,_RUNSTARTBG}"
 
 # Enable silent install
 [[ -z `grep "silentinstall" "${boot}/recovery.cmdline"` ]] && \
