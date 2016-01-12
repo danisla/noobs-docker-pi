@@ -91,14 +91,16 @@ if [[ -e "${MAIN_DOCKER_COMPOSE}" ]]; then
     [[ $? -ne 0 ]] && log "ERORR: Could not copy ${MAIN_DOCKER_COMPOSE} to ${boot}" && exit 1
     log "INFO: ${MAIN_DOCKER_COMPOSE} installed to ${boot}"
 
-    image=$(awk '/image:\s*(.*)/ {print $2}' "${MAIN_DOCKER_COMPOSE}")
+    image=$(awk '/^[[:space:]]+image:[[:space:]]*(.*)/ {print $2}' "${MAIN_DOCKER_COMPOSE}")
 
     "${boot}/pi-kitchen/059-docker-image-import/cache_docker_images.sh" "$boot" <(echo "${image}")
     [[ $? -ne 0 ]] && log "ERROR: Could not docker image in ${MAIN_DOCKER_COMPOSE}: ${image}" && exit 1
 fi
 
 # Create _USER directory structure.
-[[ ! -d "${boot}/_USER" ]] && mkdir -p "${boot}/_USER/{_RUNSTART,_RUNONCE,_RUNSTARTBG}"
+for d in _RUNSTART _RUNONCE _RUNSTARTBG; do
+    [[ ! -d "${boot}/_USER/${d}" ]] && mkdir -p "${boot}/_USER/${d}"
+done
 
 # Enable silent install
 [[ -z `grep "silentinstall" "${boot}/recovery.cmdline"` ]] && \
