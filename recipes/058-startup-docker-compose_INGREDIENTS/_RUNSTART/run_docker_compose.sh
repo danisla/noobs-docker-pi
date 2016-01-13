@@ -10,13 +10,27 @@ fi
 
 function wait_for_docker() {
     timeout=${1:-30}
-    docker info >/dev/null
     count=0
+    docker info >/dev/null
     while [[ $? != 0 && $count -lt $timeout ]]; do
         echo "Waiting for docker daemon" >> /dev/kmsg
-        docker info >/dev/null
         ((count=count+1))
         sleep 1
+        docker info >/dev/null
+    done
+
+    [[ $count -lt $timeout ]]
+}
+
+function wait_for_network() {
+    timeout=${1:-24}
+    count=0
+    docker info >/dev/null
+    while [[ $? != 0 && $count -lt $timeout ]]; do
+        echo "Waiting for network" >> /dev/kmsg
+        ((count=count+1))
+        sleep 1
+        ping -c 1 -t 5 www.google.com > /dev/null
     done
 
     [[ $count -lt $timeout ]]
@@ -35,6 +49,9 @@ if [[ ! -e `which docker-compose` ]]; then
 fi
 ###
 
+wait_for_docker || echo "Error waiting for docker" >> /dev/kmsg
+wait_for_network || echo "Error waiting for network" >> /dev/kmsg
+
 MAIN_FILE="/home/pi/recovery/docker-compose.yml"
 
 [[ -e "${MAIN_FILE}" ]] && echo "Running docker-compose -f ${MAIN_FILE} up -d" >/dev/kmsg && docker-compose -f "${MAIN_FILE}" up -d
@@ -48,3 +65,5 @@ for f in $(find ${DOCKER_RUNSTART} -name "docker-compose.yml"); do
     echo "docker-compose -f "${f}" up -d" >> /dev/kmsg
     docker-compose -f "${f}" up -d
 done
+
+sleep 5
