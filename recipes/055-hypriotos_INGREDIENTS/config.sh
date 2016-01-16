@@ -32,14 +32,18 @@ function config_hypriotos_recipe() {
     sed -i "" -e "s/.*hostname.*=.*\$/hostname=${SD_HOSTNAME}/" "${occidentalis}" || \
         (log "ERROR: Could not update hostname" && return 1)
 
-    ### HypriotOS Wifi setup ###
-    WIFI_SSID=$(get_input "Wifi SSID" "${DEFAULT_SSID}")
-    sed -i "" -e "s/.*wifi_ssid.*=.*\$/wifi_ssid=${WIFI_SSID}/" "${occidentalis}" || \
-        (log "ERROR: Could not update wifi_ssid" && return 1)
+    if [[ $(get_input "Configure Wifi? (y/n)") == "y" ]]; then
+        ### HypriotOS Wifi setup ###
+        WIFI_SSID=$(get_input "Wifi SSID" "${DEFAULT_SSID}")
+        sed -i "" -e "s/.*wifi_ssid.*=.*\$/wifi_ssid=${WIFI_SSID}/" "${occidentalis}" || \
+            (log "ERROR: Could not update wifi_ssid" && return 1)
 
-    WIFI_PASSWORD=$(get_input "Wifi PSK" "${DEFAULT_PSK}")
-    sed -i "" -e "s/.*wifi_password.*=.*\$/wifi_password=${WIFI_PASSWORD}/" "${occidentalis}" || \
-        (log "ERROR: Could not update wifi_password" && return 1)
+        WIFI_PASSWORD=$(get_input "Wifi PSK" "${DEFAULT_PSK}")
+        sed -i "" -e "s/.*wifi_password.*=.*\$/wifi_password=${WIFI_PASSWORD}/" "${occidentalis}" || \
+            (log "ERROR: Could not update wifi_password" && return 1)
+    else
+        log "INFO: Skipping wifi setup."
+    fi
 }
 
 boot=$1

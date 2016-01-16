@@ -32,6 +32,10 @@ if [[ ${DISPLAY_ROTATE} == true ]]; then
     RECIPES="${RECIPES} 062-display_rotate_180"
 fi
 
+if [[ -s "${RPI_NETWORK_INTERFACES}" ]]; then
+    RECIPES="${RECIPES} 031-replace-network-interfaces"
+fi
+
 CFG_BASE="$(pwd)"
 OS_BASE="${CFG_BASE}/os"
 INGREDIENTS="${CFG_BASE}/recipes"
@@ -84,6 +88,12 @@ for recipe in $RECIPES; do
         [[ $? -ne 0 ]] && log "ERROR: Could not cache docker images in: ${recipe_root}/docker_images.txt" && exit 1
     fi
 done
+
+# Copy custom network interfaces if provided.
+if [[ -s "${RPI_NETWORK_INTERFACES}" ]]; then
+    cp "${RPI_NETWORK_INTERFACES}" "${boot}/pi-kitchen/031-replace-network-interfaces/interfaces"
+    log "INFO: Installed custom network interfaces from: ${RPI_NETWORK_INTERFACES}"
+fi
 
 # Copy main docker-compose file.
 if [[ -e "${MAIN_DOCKER_COMPOSE}" ]]; then

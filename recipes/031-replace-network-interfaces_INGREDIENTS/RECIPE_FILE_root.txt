@@ -1,0 +1,4 @@
+#
+#Recipe: 031-replace-network-interfaces
+#- Copy the interfaces file
+../../pi-kitchen/031-replace-network-interfaces/interfaces /etc/network/interfaces
