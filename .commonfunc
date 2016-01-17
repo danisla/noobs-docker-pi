@@ -7,9 +7,15 @@ function log {
 function get_input() {
     msg=$1
     default=$2
+    show_default=${3:-true}
+
     while [[ -z "$input" ]]; do
         if [[ -n "$default" ]]; then
-            read -p "$msg ($default): " input
+            if [[ ${show_default} == true ]]; then
+                read -p "$msg ($default): " input
+            else
+                read -p "$msg: " input
+            fi
             [[ -z $input ]] && input=$default
         else
             read -p "$msg: " input
