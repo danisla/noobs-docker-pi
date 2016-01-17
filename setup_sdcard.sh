@@ -97,7 +97,7 @@ fi
 
 # Copy main docker-compose file.
 if [[ -e "${MAIN_DOCKER_COMPOSE}" ]]; then
-    rsync -L "${MAIN_DOCKER_COMPOSE}" "${boot}"
+    rsync -L "${MAIN_DOCKER_COMPOSE}" "${boot}/docker-compose.yml"
     [[ $? -ne 0 ]] && log "ERORR: Could not copy ${MAIN_DOCKER_COMPOSE} to ${boot}" && exit 1
     log "INFO: ${MAIN_DOCKER_COMPOSE} installed to ${boot}"
 
@@ -114,6 +114,12 @@ fi
 # Create _USER directory structure.
 for d in _RUNSTART _RUNONCE _RUNSTARTBG; do
     [[ ! -d "${boot}/_USER/${d}" ]] && mkdir -p "${boot}/_USER/${d}"
+done
+
+# Copy _USER data files specified in the ENV.
+for f in $_USER_FILES; do
+    log "INFO: Copying ${f} to ${boot}/_USER"
+    cp -rf "$f" "${boot}/_USER/"
 done
 
 # Enable silent install

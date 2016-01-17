@@ -30,7 +30,8 @@ function cache_docker_images() {
 
         log "INFO: Saving compressed docker image of ${img} to ${dest_img}"
 
-        test -z $((docker save "${img}" | gzip - > "${dest_img}") 2>/dev/null)
+        docker save "${img}" | gzip - > "${dest_img}" 2>/dev/null
+        [[ $(du "${dest_img}" | awk '{print $1}') -gt 1024 ]]
     }
 
     failed=0
@@ -39,7 +40,7 @@ function cache_docker_images() {
         dest_img="${dest_img/:/_}"
 
         # Skip existing image.
-        [[ "${SKIP_EXISTING}" == "true" && -e "${dest_img}" ]] && continue
+        [[ "${SKIP_EXISTING_CACHED_IMAGES}" == "true" && -e "${dest_img}" ]] && continue
 
         pull=false
         for i in `seq 2`; do
