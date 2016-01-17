@@ -6,6 +6,10 @@ function log {
   >&2 echo "${@}"
 }
 
+function check_docker() {
+    docker info >/dev/null 2>&1
+}
+
 function cache_docker_images() {
     dest=$1
     img_list_file=$2
@@ -35,7 +39,7 @@ function cache_docker_images() {
         dest_img="${dest_img/:/_}"
 
         # Skip existing image.
-        [[ -e "${dest_img}" ]] && continue
+        [[ "${SKIP_EXISTING}" == "true" && -e "${dest_img}" ]] && continue
 
         pull=false
         for i in `seq 2`; do
@@ -67,5 +71,8 @@ IMG_LIST=$2
 [[ -z "$SD_ROOT" || -z "$IMG_LIST" ]] && echo "USAGE: $0 <dest sd root dir, ex: /Volumes/RECOVERY> <image list file>]" && exit 1
 
 DOCKER_IMAGE_DIR="${SD_ROOT}/docker_images"
+
+check_docker
+[[ $? -ne 0 ]] && log "ERROR: Could not connect to docker engine." && exit 1
 
 cache_docker_images "$DOCKER_IMAGE_DIR" "$IMG_LIST"
