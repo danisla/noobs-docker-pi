@@ -57,16 +57,13 @@ function install_os() {
     boot_archive="${os_base}/${os}/boot.tar.xz"
     root_archive="${os_base}/${os}/root.tar.xz"
 
-    log "DEBUG: ${boot_archive} ${root_archive}"
-
     if [[ ! -e "${boot_archive}" || ! -e "${root_archive}" ]]; then
 
-        [[ ! -e `which vagrant` ]] && log "ERROR: vagrant is not installed, cannot install ${os}" && return 1
+        [[ -z "${RPI_IMG}" ]] && log "ERROR: Cannot build ${os} tarballs, RPI_IMG is not set, must point to .img file." && return 1
 
-        [[ -z "${RPI_IMG}" ]] && log "ERROR: Cannot build ${os} tarballs, RPI_IMG is not set, must point to .img or .img.zip file." && return 1
-        export OS_NAME="$os"
+        make_tarballs_docker "${os}" "${RPI_IMG}"
+        [[ $? -ne 0 ]] && return 1
 
-        (vagrant up --provision && vagrant destroy -f) || (log "ERROR: Could not generate $os tarballs." && return 1)
     else
         log "INFO: ${os} $(basename ${boot_archive}) and $(basename ${root_archive}) already exist, skipping rebuild."
     fi
@@ -74,6 +71,18 @@ function install_os() {
     log "INFO: Copying ${os_base}/${os} to ${boot}/os/${os}"
     rsync -r "${os_base}/${os}" "${boot}/os/" && \
     cd "${oldpwd}" >/dev/null || (log "ERROR: Could not sync ${os} files." && return 1)
+}
+
+make_tarballs_docker() {
+    os=$1
+    img=$2
+
+    docker run -it --rm --privileged \
+        -v "$(pwd)/make_tar_xz_from_img.sh:/usr/local/bin/make_tar_xz_from_img.sh:ro" \
+        -v "${img}:/opt/os.img:ro" \
+        -v "$(pwd)/os:/opt/os:rw" \
+        --entrypoint=bash \
+        centos:latest -c "bash /usr/local/bin/make_tar_xz_from_img.sh /opt/os.img '/opt/os/${os}'"
 }
 
 function install_recipe() {

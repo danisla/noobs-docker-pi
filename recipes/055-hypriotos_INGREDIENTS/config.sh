@@ -25,7 +25,7 @@ function config_hypriotos_recipe() {
 
     occidentalis="${boot}/pi-kitchen/055-hypriotos/occidentalis.txt"
 
-    tmp_hostname="black-pearl-$((RANDOM % 1000 + 200))"
+    tmp_hostname=${DEFAULT_HOSTNAME:-"black-pearl-$((RANDOM % 1000 + 200))"}
 
     ### HypriotOS Hostname setup ###
     SD_HOSTNAME=$(get_input "Hostname" "${tmp_hostname}")
