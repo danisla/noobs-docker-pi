@@ -83,10 +83,13 @@ for recipe in $RECIPES; do
     fi
 
     # Cache docker images.
-    if [[ -e "${recipe_root}/docker_images.txt" ]]; then
-        "${boot}/pi-kitchen/059-docker-image-import/cache_docker_images.sh" "$boot" "${recipe_root}/docker_images.txt"
-        [[ $? -ne 0 ]] && log "ERROR: Could not cache docker images in: ${recipe_root}/docker_images.txt" && exit 1
-    fi
+    # TODO: wait until Docker v1.10 so that images created with `docker load` have the same ids as those with `docker pull`
+    # Otherwise the `docker pull` in the _RUNSTART script will immediately overwrite the loaded image so caching has no effect.
+    # https://github.com/docker/docker/issues/17410
+    # if [[ -e "${recipe_root}/docker_images.txt" ]]; then
+    #     "${boot}/pi-kitchen/059-docker-image-import/cache_docker_images.sh" "$boot" "${recipe_root}/docker_images.txt"
+    #     [[ $? -ne 0 ]] && log "ERROR: Could not cache docker images in: ${recipe_root}/docker_images.txt" && exit 1
+    # fi
 done
 
 # Copy custom network interfaces if provided.
@@ -101,14 +104,14 @@ if [[ -e "${MAIN_DOCKER_COMPOSE}" ]]; then
     [[ $? -ne 0 ]] && log "ERORR: Could not copy ${MAIN_DOCKER_COMPOSE} to ${boot}" && exit 1
     log "INFO: ${MAIN_DOCKER_COMPOSE} installed to ${boot}"
 
-    images=$(awk '/^[[:space:]]+image:[[:space:]]*(.*)/ {print $2}' "${MAIN_DOCKER_COMPOSE}")
-
-    for image in $images; do
-        log "INFO: Caching docker images: ${image}"
-
-        "${boot}/pi-kitchen/059-docker-image-import/cache_docker_images.sh" "$boot" <(echo "${image}")
-        [[ $? -ne 0 ]] && log "ERROR: Could not docker image in ${MAIN_DOCKER_COMPOSE}: ${image}" && exit 1
-    done
+    # TODO: see previous comment about cachine docker images and why this is defered to v1.10.
+    # images=$(awk '/^[[:space:]]+image:[[:space:]]*(.*)/ {print $2}' "${MAIN_DOCKER_COMPOSE}")
+    # for image in $images; do
+    #     log "INFO: Caching docker images: ${image}"
+    #
+    #     "${boot}/pi-kitchen/059-docker-image-import/cache_docker_images.sh" "$boot" <(echo "${image}")
+    #     [[ $? -ne 0 ]] && log "ERROR: Could not docker image in ${MAIN_DOCKER_COMPOSE}: ${image}" && exit 1
+    # done
 fi
 
 # Create _USER directory structure.
