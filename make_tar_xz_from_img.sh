@@ -11,7 +11,7 @@ declare -a offsets
 
 function compute_offsets() {
     img=$1
-    parts=($(fdisk -lu "${img}" | awk '/\.img[0-9]/ {print $2}'))
+    parts=($(fdisk -lu "${img}" | sed 's/\*//g' | awk '/\.img[0-9]/ {print $2}'))
     for i in `seq 0 1`; do
         start=${parts[$i]}
         ((offsets[$i]=start*512))
