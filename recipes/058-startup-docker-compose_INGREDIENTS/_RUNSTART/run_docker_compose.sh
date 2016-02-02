@@ -6,6 +6,8 @@ if [ "$_" != "/bin/bash" ]; then
     exit
 fi
 
+echo "Current IP Address: `hostname -I`" > >(tee /dev/kmsg) 2> >(tee /dev/kmsg >&2)
+
 [[ -e "/boot/config.txt" && -n $(grep '^disable_runstart=1' "/boot/config.txt") ]] && echo "$0 disabled by config.txt disable_runstart=1" >> /dev/kmsg && exit
 
 function wait_for_docker() {
