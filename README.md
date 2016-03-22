@@ -41,7 +41,7 @@ First install [Docker](https://www.docker.com/docker-toolbox), then run this:
 
 ```
 export os="HypriotOS"
-export RPI_IMG=${HOME}/Downloads/hypriot-rpi-20151115-132854.img
+export RPI_IMG=${HOME}/Downloads/hypriot-rpi-20160306-192317.img
 docker run -it --rm --privileged \
     -v "$(pwd)/make_tar_xz_from_img.sh:/usr/local/bin/make_tar_xz_from_img.sh:ro" \
     -v "${img}:/opt/os.img:ro" \

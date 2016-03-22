@@ -1,7 +1,13 @@
-#!/bin/sh -e
+#!/bin/bash
+# This script will run the first time the raspberry pi boots.
+# It is ran as root.
 
-# Call firstboot script bundled with HypriotOS to finish Docker setup.
 echo 'Starting firstboot.sh' >> /dev/kmsg
+
+# resize root partion to possible maximum
+# NOTE: Skipping in the context of the noobs installer.
+#echo 'Resizing root partition' >> /dev/kmsg
+#/usr/local/bin/resize_root_partition
 
 # Get current date from debian time server
 ntpdate 0.debian.pool.ntp.org
@@ -41,7 +47,9 @@ EOF
 echo 'Reconfigured locale' >> /dev/kmsg
 
 # Set timezone
+# NOTE: always use GMT on a server.
 echo 'GMT' > /etc/timezone
+#echo 'Europe/Berlin' > /etc/timezone
 dpkg-reconfigure -f noninteractive tzdata
 
 echo 'Reconfigured timezone' >> /dev/kmsg

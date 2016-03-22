@@ -131,8 +131,7 @@ function install_recipe() {
 function install_noobs() {
     boot=$1
 
-    #NOOBS_URL="https://downloads.raspberrypi.org/NOOBS/images/NOOBS-2015-11-24/NOOBS_v1_5_0.zip"
-    NOOBS_URL="https://downloads.raspberrypi.org/NOOBS_lite/images/NOOBS_lite-2015-11-24/NOOBS_lite_v1_5.zip"
+    NOOBS_URL=${NOOBS_URL:-"https://downloads.raspberrypi.org/NOOBS_lite/images/NOOBS_lite-2016-03-18/NOOBS_lite_v1_9.zip"}
     NOOBS_ZIP="/tmp/$(basename $NOOBS_URL)"
     NOOBS_DIR="/tmp/$(basename $NOOBS_URL .zip)"
     if [[ ! -e "${NOOBS_ZIP}" ]]; then

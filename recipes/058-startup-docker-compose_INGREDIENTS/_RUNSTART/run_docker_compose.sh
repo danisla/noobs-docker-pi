@@ -13,12 +13,12 @@ echo "Current IP Address: `hostname -I`" > >(tee /dev/kmsg) 2> >(tee /dev/kmsg >
 function wait_for_docker() {
     timeout=${1:-30}
     count=0
-    docker info >/dev/null
+    docker pull busybox >/dev/null 2>&1
     while [[ $? != 0 && $count -lt $timeout ]]; do
         echo "Waiting for docker daemon" >> /dev/kmsg
         ((count=count+1))
-        sleep 1
-        docker info >/dev/null
+        sleep 5
+        docker pull busybox >/dev/null 2>&1
     done
 
     [[ $count -lt $timeout ]]
