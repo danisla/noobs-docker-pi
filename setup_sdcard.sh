@@ -59,7 +59,12 @@ get_boot_dir
 
 if [[ $INIT == true ]]; then
     install_noobs "$boot" && install_os "$boot" "$OS" "$OS_BASE"
-    [[ $? -ne 0 ]] && log "ERROR: Could not install NOOBS at: ${boot}" && exit 1
+    [[ $? -ne 0 ]] && log "ERROR: Could not install NOOBS and ${OS} at: ${boot}" && exit 1
+fi
+
+if [[ ! -d "${boot}/os/${OS}" ]]; then
+    install_os "$boot" "$OS" "$OS_BASE"
+    [[ $? -ne 0 ]] && log "ERROR: Could not install ${OS} at: ${boot}" && exit 1
 fi
 [[ ! -d "${boot}/os/${OS}" ]] && log "ERROR: ${boot}/os/${OS} directory not found, did you forget to install NOOBS and the OS?" && exit 1
 
